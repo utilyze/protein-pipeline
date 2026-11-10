@@ -20,6 +20,12 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install --disable-pip-version-check -e . pytest
       - run: python -m pytest -q
+      - name: Synthetic offline demonstration
+        run: python examples/synthetic/run_demo.py
+      - name: Build standalone wheel
+        run: python -m pip wheel --no-deps -w dist .
+      - name: Verify Python bytecode compilation
+        run: python -m compileall -q src/protein_pipeline
       - run: python -m protein_pipeline --help
       - name: No provider access granted to ordinary CI
         run: echo "No NVIDIA key or paid inference is required."
