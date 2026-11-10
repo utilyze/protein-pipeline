@@ -17,7 +17,7 @@ It is a public source structure, not evidence that a generated candidate binds. 
 chains must be removed in a controlled conditioning workflow and cannot be mistaken for a generated
 binder chain.
 
-The source validation of 7OW6 and a private H1 input must use different digests and profiles.
+Each distinct source structure must have its own digest and source-specific validation profile.
 Profile creation is self-asserted, not a certificate that the reference itself is biologically correct.
 
-The separate MolProbity demo involved a different 40-residue protein and cannot certify these candidates.
+Geometric screening is not experimental validation or an official MolProbity assessment.
