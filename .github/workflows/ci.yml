@@ -20,6 +20,59 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install --disable-pip-version-check -e . pytest
       - run: python -m pytest -q
+      - name: Synthetic offline demonstration
+        run: python examples/synthetic/run_demo.py
+      - name: Build standalone wheel
+        run: python -m pip wheel --no-deps -w dist .
+      - name: Verify official license, SPDX metadata and wheel payload
+        shell: bash
+        run: |
+          python - <<'PY'
+          import glob, pathlib, tomllib, zipfile
+          project = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']
+          assert project['license'] == 'Apache-2.0'
+          assert 'LICENSE' in project['license-files']
+          license_text = pathlib.Path('LICENSE').read_text()
+          assert 'Apache License' in license_text
+          assert 'Version 2.0, January 2004' in license_text
+          assert '3. Grant of Patent License' in license_text
+          wheels = glob.glob('dist/*.whl')
+          assert len(wheels) == 1, wheels
+          with zipfile.ZipFile(wheels[0]) as wheel:
+              names = wheel.namelist()
+              metadata_names = [n for n in names if n.endswith('.dist-info/METADATA')]
+              assert len(metadata_names) == 1
+              metadata = wheel.read(metadata_names[0]).decode()
+              assert 'License-Expression: Apache-2.0' in metadata, metadata
+              license_names = [n for n in names if n.endswith('/LICENSE')]
+              assert len(license_names) >= 1, names
+              assert any(b'Apache License' in wheel.read(n) for n in license_names)
+          print('Apache-2.0 source and wheel license consistency passed')
+          PY
+      - name: Install built wheel in clean environment
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/protein-release-env"
+          "$RUNNER_TEMP/protein-release-env/bin/python" -m pip install --disable-pip-version-check dist/*.whl
+          "$RUNNER_TEMP/protein-release-env/bin/protein-pipeline" --help
+      - name: Verify independently downloaded public PDB 7OW6
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error --retry 1 --max-time 90             "https://files.rcsb.org/download/7OW6.cif"             --output "$RUNNER_TEMP/7OW6.cif"
+          python -m protein_pipeline inspect "$RUNNER_TEMP/7OW6.cif" > "$RUNNER_TEMP/7ow6_inspection.json"
+          python - "$RUNNER_TEMP/7ow6_inspection.json" <<'PY'
+          import json, sys
+          with open(sys.argv[1], encoding="utf-8") as f:
+              data = json.load(f)
+          chains = data["chains"]
+          assert chains["A"]["length"] == 276, "7OW6 HLA source chain mismatch"
+          assert chains["B"]["length"] == 99, "7OW6 B2M modeled chain mismatch"
+          assert chains["C"]["length"] == 10, "7OW6 KRAS peptide chain mismatch"
+          assert "D" in chains and "E" in chains, "Missing original reference TCR chains"
+          print("Public 7OW6 source inspection passed; D/E are original TCR, not modeled binder.")
+          PY
+      - name: Verify Python bytecode compilation
+        run: python -m compileall -q src/protein_pipeline
       - run: python -m protein_pipeline --help
       - name: No provider access granted to ordinary CI
         run: echo "No NVIDIA key or paid inference is required."

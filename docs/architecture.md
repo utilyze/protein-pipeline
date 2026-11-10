@@ -8,7 +8,5 @@
 - `replay.py`: source-derived historical replay, requires operator-supplied original evidence ZIP.
 - `cli.py`: ordinary read-only commands; never calls a remote model.
 
-Lineage: reimplementation and extraction informed by `protein_studio/core.py`,
-`rfd4_direct_api.py`, `rfd4_preflight.py`, `kras_grinder.py`, `public_kras_7ow6.py`
-at `utilyze/research-platform` PR #183 and PR #182, and the user's prior local private replay utility.
-This is not a branch or copy of the private repository's Git history.
+Lineage: standalone Utilyze-owned implementation maintained as its own Git repository.
+No private parent-repository commit history, provider data or unpublished protein designs are included.

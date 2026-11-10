@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: If you use this software, cite the public repository once a release is approved.
+message: If you use this software, cite the Utilyze Protein Pipeline public repository and versioned release.
 title: Utilyze Protein Pipeline
 authors:
   - name: Utilyze, Inc.

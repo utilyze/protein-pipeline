@@ -1,9 +1,9 @@
 # Utilyze Protein Pipeline
 
-**PRIVATE FOUNDER REVIEW CANDIDATE. NOT AN APPROVED PUBLIC RELEASE.**
+**Open-source scientific toolkit. Licensed under Apache-2.0.**
 
 CPU-first, source-aware structural identity and geometric screening for computational protein research.
-Extracted and adapted from the private Utilyze research-platform prototype into a separate package.
+Standalone software for auditable molecular validation, not a distribution of any private research portfolio.
 
 **Not a protein generator by default.** It can validate target identities, verify local model-response envelopes,
 calculate simple heavy-atom distances, and replay privately supplied evidence archives. It does not demonstrate
@@ -36,8 +36,7 @@ protein-pipeline inspect /path/to/7OW6.cif
 The output lists chain lengths and sequence fingerprints, not private candidate sequences.
 The 7OW6 reference contains original TCR chains D/E and is **not a generated binder structure**.
 To evaluate generated outputs, use a separately authorized modeled complex and a profile from its exact
-conditioning target, not the raw reference with TCR D/E. The public and private H1 source profiles
-must never be interchanged.
+conditioning target, not the raw reference with TCR D/E. Source profiles from different conditioning structures must never be interchanged.
 
 ## One-command synthetic example (offline)
 
@@ -57,13 +56,12 @@ or new scientific findings. See `tests/` and `examples/synthetic/`.
 ## Historical evidence replay
 
 ```bash
-protein-pipeline replay /PRIVATE/YOUR_OWN_KRAS_RFD4_EVIDENCE.zip
+protein-pipeline replay /path/to/authorized_evidence.zip
 ```
 
-Only works with the matching **privately held** original evidence archive layout. The archive is not shipped.
-It was previously replayed against seven provider responses with 24 outputs, 22 target-preserving outputs,
-20 shortlisted structures and specific distance checks. This private historical result is not publicly
-reproducible without the original inputs.
+Only works with a matching **operator-supplied and legally authorized** evidence archive.
+Original provider responses, candidate coordinates and confidential campaign results are not shipped;
+the synthetic tests and public reference inspection demonstrate only the reproducible public functionality.
 
 ## Critical scientific boundaries
 
@@ -71,12 +69,13 @@ reproducible without the original inputs.
 - Pair distances are simple geometry, not an official MolProbity clashscore.
 - NVIDIA RFD4-Proteina is the third-party generator. Utilyze does not claim authorship of its model.
 - Historical challenge results are computational and were not experimentally validated.
-- The founder reported 19/20 pass initial Proteinbase screening; individual novelty grades and a matching
-  competition-specific receipt have not been independently obtained.
 
-See `docs/methods.md`, `docs/rights.md`, and `docs/release_gate.md`.
+See `docs/methods.md`, `docs/reproducibility.md`, and `docs/third_party_notices.md`.
 
 ## License
 
-**Not selected.** This artifact is for private review only. Code contributor ownership, external terms,
-and disclosure approval must be resolved before public release.
+Copyright 2026 Utilyze, Inc. The standalone Utilyze-owned software is licensed under the
+[Apache License 2.0](LICENSE), including the limited patent grant specified in Section 3.
+This license does not grant rights to NVIDIA services, provider outputs, proprietary model weights,
+third-party trademarks, confidential research assets, or unrelated Utilyze repositories.
+See [third-party notices](docs/third_party_notices.md) for dependency and external-source attribution.

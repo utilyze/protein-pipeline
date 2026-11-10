@@ -20,13 +20,27 @@ def digest(blob:bytes)->str:
     return hashlib.sha256(blob).hexdigest()
 
 def safe_members(z:zipfile.ZipFile):
-    if len(z.infolist())>MAX_ZIP_ENTRIES or sum(x.file_size for x in z.infolist())>MAX_ZIP_TOTAL:
+    entries=z.infolist()
+    if len(entries)>MAX_ZIP_ENTRIES or sum(x.file_size for x in entries)>MAX_ZIP_TOTAL:
         raise ValueError('Archive exceeds bounded total size/count')
-    for entry in z.infolist():
-        if (entry.file_size>MAX_ZIP_MEMBER or entry.filename.startswith("/") or ".." in Path(entry.filename).parts):
-            raise ValueError("Disallowed archive member")
+    seen=set()
+    for entry in entries:
+        name=entry.filename
+        if (entry.file_size>MAX_ZIP_MEMBER or name.startswith('/')
+                or '\\' in name or '..' in Path(name).parts or not name):
+            raise ValueError('Disallowed archive member')
+        if name in seen:
+            raise ValueError('Duplicate archive member name')
+        seen.add(name)
+        # Only regular files and directories are expected. Do not interpret
+        # symlink/device archive entries as trusted evidence containers.
+        mode=(entry.external_attr >> 16) & 0o170000
+        if mode not in (0,0o100000,0o040000):
+            raise ValueError('Nonregular archive member')
+        if entry.flag_bits & 1:
+            raise ValueError('Encrypted archive entry not supported')
     if z.testzip() is not None:
-        raise ValueError("Corrupted ZIP member")
+        raise ValueError('Corrupted ZIP member')
 
 def inspect_sequence(seq:str)->bool:
     return isinstance(seq,str) and 70 <= len(seq)<=100 and set(seq)<=AA

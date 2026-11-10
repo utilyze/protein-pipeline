@@ -1,4 +1,4 @@
-"""Explicit source-scoped identity fingerprints, never private embedded H1 values."""
+"""Explicit source-scoped identity fingerprints; no embedded private structures."""
 from __future__ import annotations
 from dataclasses import dataclass
 import json
@@ -38,12 +38,15 @@ class TargetProfile:
             raise ValueError('Invalid chain fingerprint')
         if any(type(v)!=int or not 1<=v<=10000 for v in lengths.values()):
             raise ValueError('Invalid sequence length')
-        if data['provenance_status'] not in ('self_asserted','source_hash_verified'):
-            raise ValueError('Unsupported provenance label')
+        if data['provenance_status'] != 'self_asserted':
+            # A JSON field is not evidence that original source bytes were checked.
+            raise ValueError('Provenance cannot be elevated through profile JSON')
         if not isinstance(data['binder_chain'],str) or not data['binder_chain'] or data['binder_chain'] in digs:
             raise ValueError('Invalid binder identifier')
         if data['peptide_chain'] is not None:
-            if data['peptide_chain'] not in digs or not isinstance(data['expected_peptide'],str):
+            if (data['peptide_chain'] not in digs or not isinstance(data['expected_peptide'],str)
+                    or not 1 <= len(data['expected_peptide']) <= 10000
+                    or not data['expected_peptide'].isupper()):
                 raise ValueError('Invalid peptide chain')
         elif data['expected_peptide'] is not None:raise ValueError('Peptide without chain ID')
         return cls(**data)
@@ -76,13 +79,17 @@ def validate_output(output:Molecule,profile:TargetProfile)->dict:
             raise ValueError(f'Generated target chain {c} differs from source')
     if profile.peptide_chain is not None and output.chain_sequences[profile.peptide_chain]!=profile.expected_peptide:
         raise ValueError('Incorrect target peptide')
+    # Sequence equality alone cannot certify that every modeled target residue
+    # has the basic backbone coordinates needed for interpretable screening.
+    for chain in required:
+        sequence=output.chain_sequences[chain]
+        by_residue={}
+        for atom in output.atoms[chain]:
+            by_residue.setdefault(atom.residue_ordinal,set()).add(atom.atom_name)
+        if len(by_residue)!=len(sequence) or any(
+                not {'N','CA','C','O'}.issubset(names) for names in by_residue.values()):
+            raise ValueError(f'Incomplete N/CA/C/O backbone in chain {chain}')
     binder=output.chain_sequences[profile.binder_chain]
-    if not binder:raise ValueError('Empty binder')
-    by_residue={}
-    for atom in output.atoms[profile.binder_chain]:
-        by_residue.setdefault(atom.residue_ordinal,set()).add(atom.atom_name)
-    if len(by_residue)!=len(binder) or any(not {'N','CA','C','O'}.issubset(names) for names in by_residue.values()):
-        raise ValueError('Binder backbone has incomplete N/CA/C/O atoms')
     return {'status':'SOURCE_CHAIN_IDENTITY_PASSED','source_id':profile.source_id,
       'source_sha256':profile.source_sha256,'candidate_structure_sha256':output.sha256,
       'binder_chain':profile.binder_chain,'binder_length':len(binder),
