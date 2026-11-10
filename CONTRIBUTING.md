@@ -1,8 +1,12 @@
 # Contributing
 
-This repository is a **private release candidate** while code rights and licensing are under review. Do not submit confidential structures, unpublished sequences, provider responses, credentials, or personal data in issues or pull requests. Before external contributions are accepted, maintainers must approve a final contribution and licensing policy.
+This project is distributed under the Apache License 2.0. Contributions intentionally submitted
+for inclusion are governed by Apache-2.0 Section 5 unless a separate agreement applies.
+Contributors must have the rights necessary to submit their work and must preserve relevant
+third-party notices. Never submit confidential structures, unpublished sequences, provider responses,
+credentials or personal data in public issues or pull requests.
 
-Once public and appropriately licensed, proposed changes should include:
+Proposed changes should include:
 
 1. A minimal scientific rationale and the precise source structure and version, if relevant.
 2. Deterministic offline tests (including malformed and wrong-target negatives).
