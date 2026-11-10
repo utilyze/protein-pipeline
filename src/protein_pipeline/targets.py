@@ -1,4 +1,4 @@
-"""Explicit source-scoped identity fingerprints, never private embedded H1 values."""
+"""Explicit source-scoped identity fingerprints; no embedded private structures."""
 from __future__ import annotations
 from dataclasses import dataclass
 import json
