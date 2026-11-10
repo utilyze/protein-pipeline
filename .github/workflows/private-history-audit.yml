@@ -1,0 +1,24 @@
+name: Private history disclosure audit
+on:
+  push:
+    branches: ['release/acceptance05-public-readiness-20261109']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  history-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Fetch authenticated complete Git branch/tag history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: true
+      - name: Fetch accessible pull request heads
+        shell: bash
+        run: |
+          git fetch --no-tags origin '+refs/pull/*/head:refs/remotes/origin/pr/*'
+      - name: Scan reachable objects without revealing contents
+        run: python scripts/private_history_audit.py --out "$RUNNER_TEMP/private_history_audit_results.json"
