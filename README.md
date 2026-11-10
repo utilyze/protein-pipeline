@@ -1,5 +1,82 @@
 # Utilyze Protein Pipeline
 
-Private staging repository for the standalone source-aware scientific validation package. Not approved for public release.
+**PRIVATE FOUNDER REVIEW CANDIDATE. NOT AN APPROVED PUBLIC RELEASE.**
 
-This repository is being initialized with the audited offline code snapshot. No unpublished protein sequences, raw provider responses, or private H1 molecular inputs should be committed.
+CPU-first, source-aware structural identity and geometric screening for computational protein research.
+Extracted and adapted from the private Utilyze research-platform prototype into a separate package.
+
+**Not a protein generator by default.** It can validate target identities, verify local model-response envelopes,
+calculate simple heavy-atom distances, and replay privately supplied evidence archives. It does not demonstrate
+binding affinity, fold stability, mutant specificity, experimentally confirmed binders, or an independently
+attested NVIDIA response. The optional fixed-host NVIDIA adapter is explicitly gated and never called by tests.
+
+## Install and verify
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install -e . pytest
+python -m pytest -q
+protein-pipeline --help
+```
+
+## Public-reference inspection, no API token
+
+Download the RCSB 7OW6 coordinate file yourself, subject to the upstream data terms:
+
+- https://www.rcsb.org/structure/7OW6
+- https://files.rcsb.org/download/7OW6.cif
+
+Then run:
+
+```bash
+protein-pipeline inspect /path/to/7OW6.cif
+```
+
+The output lists chain lengths and sequence fingerprints, not private candidate sequences.
+The 7OW6 reference contains original TCR chains D/E and is **not a generated binder structure**.
+To evaluate generated outputs, use a separately authorized modeled complex and a profile from its exact
+conditioning target, not the raw reference with TCR D/E. The public and private H1 source profiles
+must never be interchanged.
+
+## One-command synthetic example (offline)
+
+```bash
+python examples/synthetic/run_demo.py
+```
+
+The demo prints a source identity decision and heavy-atom distance counts. It uses
+artificial coordinates and does not reproduce or predict a biological binder.
+
+## Testable synthetic workflow
+
+The unit tests build artificial mmCIF fixtures in memory to test molecular identity, source hashing,
+mutation-atom categorization and distance thresholds. Fixtures are not measured structures, provider designs,
+or new scientific findings. See `tests/` and `examples/synthetic/`.
+
+## Historical evidence replay
+
+```bash
+protein-pipeline replay /PRIVATE/YOUR_OWN_KRAS_RFD4_EVIDENCE.zip
+```
+
+Only works with the matching **privately held** original evidence archive layout. The archive is not shipped.
+It was previously replayed against seven provider responses with 24 outputs, 22 target-preserving outputs,
+20 shortlisted structures and specific distance checks. This private historical result is not publicly
+reproducible without the original inputs.
+
+## Critical scientific boundaries
+
+- A SHA-256 digest verifies byte integrity, not remote provider provenance.
+- Pair distances are simple geometry, not an official MolProbity clashscore.
+- NVIDIA RFD4-Proteina is the third-party generator. Utilyze does not claim authorship of its model.
+- Historical challenge results are computational and were not experimentally validated.
+- The founder reported 19/20 pass initial Proteinbase screening; individual novelty grades and a matching
+  competition-specific receipt have not been independently obtained.
+
+See `docs/methods.md`, `docs/rights.md`, and `docs/release_gate.md`.
+
+## License
+
+**Not selected.** This artifact is for private review only. Code contributor ownership, external terms,
+and disclosure approval must be resolved before public release.

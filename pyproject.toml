@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "utilyze-protein-pipeline"
+version = "0.1.0"
+description = "Source-aware molecular identity and geometry auditing for computational protein research"
+requires-python = ">=3.11"
+dependencies = ["gemmi>=0.7,<0.8", "numpy>=1.26,<3"]
+classifiers = ["Programming Language :: Python :: 3", "Topic :: Scientific/Engineering :: Bio-Informatics"]
+
+[project.scripts]
+protein-pipeline = "protein_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths=["tests"]
