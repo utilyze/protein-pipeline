@@ -71,11 +71,9 @@ reproducible without the original inputs.
 - Pair distances are simple geometry, not an official MolProbity clashscore.
 - NVIDIA RFD4-Proteina is the third-party generator. Utilyze does not claim authorship of its model.
 - Historical challenge results are computational and were not experimentally validated.
-- The founder reported 19/20 pass initial Proteinbase screening; individual novelty grades and a matching
-  competition-specific receipt have not been independently obtained.
 
-See `docs/methods.md`, `docs/reproducibility.md`, `docs/rights.md`, `docs/license_proposal.md`, `docs/third_party_notices.md`, and `docs/release_gate.md`.
+See `docs/methods.md`, `docs/reproducibility.md`, and `docs/third_party_notices.md`.
 
 ## License
 
-**Not yet selected or authorized.** `docs/license_proposal.md` compares proposed licensing and explains the decision required. Until the release gate is satisfied, no outbound open-source license is granted. Code ownership, third-party terms, and disclosures require approval.
+**Proposed license: Apache-2.0.** Outbound licensing is not active until Utilyze's ownership and patent-grant authorization is confirmed and the standard `LICENSE` file is committed. Until then this private release candidate is not open source.
