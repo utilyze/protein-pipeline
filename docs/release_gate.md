@@ -13,5 +13,4 @@ Mandatory checks before public visibility:
 9. Inspect the exact future public commit and CI checks, then switch visibility.
 10. Verify unauthenticated clone and read-only public accessibility.
 
-The GitHub connector used for this execution does not expose repository creation or visibility changes.
-The public release therefore remains blocked pending an authorized tool/action.
+The standalone repository already exists privately and the current `main` CI passed on Python 3.11 and 3.12. A private release-candidate branch is being prepared. Public visibility, merge, licensing, and external publication remain blocked until the founder authorizes the exact reviewed tree and all mandatory rights gates pass.

@@ -221,3 +221,62 @@ def test_noncanonical_polymer_residue_rejected():
     assert 'GLY A 1 2' in text
     text=text.replace('GLY A 1 2','UNK A 1 2').replace(' 2 GLY A ', ' 2 UNK A ')
     with pytest.raises(ValueError):parse_structure(text.encode())
+
+
+def test_profile_provenance_cannot_be_self_certified():
+    _,profile=setup_source()
+    record=json.loads(profile.to_json())
+    record['provenance_status']='source_hash_verified'
+    with pytest.raises(ValueError,match='Provenance'):
+        TargetProfile.from_json(json.dumps(record))
+
+def test_profile_rejects_invalid_expected_peptide():
+    _,profile=setup_source()
+    for value in ('', 'vvvgadgvgk', 123, None):
+        record=json.loads(profile.to_json())
+        record['expected_peptide']=value
+        with pytest.raises(ValueError):TargetProfile.from_json(json.dumps(record))
+
+def test_output_rejects_target_backbone_missing_even_if_sequence_matches():
+    _,profile=setup_source()
+    obj=parse_structure(make_synthetic_cif())
+    from dataclasses import replace
+    from protein_pipeline.molecules import Molecule
+    altered=dict(obj.atoms)
+    altered['C']=tuple(a for a in obj.atoms['C'] if not (a.residue_ordinal==4 and a.atom_name=='CA'))
+    partial=replace(obj,atoms=altered)
+    with pytest.raises(ValueError,match='Incomplete.*chain C'):
+        validate_output(partial,profile)
+
+def test_output_rejects_binder_backbone_missing():
+    _,profile=setup_source()
+    obj=parse_structure(make_synthetic_cif())
+    from dataclasses import replace
+    altered=dict(obj.atoms)
+    altered['D']=tuple(a for a in obj.atoms['D'] if not (a.residue_ordinal==2 and a.atom_name=='N'))
+    with pytest.raises(ValueError,match='Incomplete.*chain D'):
+        validate_output(replace(obj,atoms=altered),profile)
+
+
+def test_zip_duplicate_names_rejected():
+    import warnings
+    f=io.BytesIO()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore',UserWarning)
+        with zipfile.ZipFile(f,'w') as z:
+            z.writestr('repeated.json','one')
+            z.writestr('repeated.json','two')
+    with zipfile.ZipFile(io.BytesIO(f.getvalue())) as z:
+        with pytest.raises(ValueError,match='Duplicate archive'):
+            safe_members(z)
+
+def test_zip_symlink_rejected():
+    f=io.BytesIO()
+    with zipfile.ZipFile(f,'w') as z:
+        info=zipfile.ZipInfo('link')
+        info.create_system=3
+        info.external_attr=(0o120777 << 16)
+        z.writestr(info,'../elsewhere')
+    with zipfile.ZipFile(io.BytesIO(f.getvalue())) as z:
+        with pytest.raises(ValueError,match='Nonregular'):
+            safe_members(z)

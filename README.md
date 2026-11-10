@@ -1,6 +1,6 @@
 # Utilyze Protein Pipeline
 
-**PRIVATE FOUNDER REVIEW CANDIDATE. NOT AN APPROVED PUBLIC RELEASE.**
+**PRIVATE RELEASE CANDIDATE. NOT YET LICENSED OR APPROVED FOR PUBLIC DISTRIBUTION.**
 
 CPU-first, source-aware structural identity and geometric screening for computational protein research.
 Extracted and adapted from the private Utilyze research-platform prototype into a separate package.
@@ -74,9 +74,8 @@ reproducible without the original inputs.
 - The founder reported 19/20 pass initial Proteinbase screening; individual novelty grades and a matching
   competition-specific receipt have not been independently obtained.
 
-See `docs/methods.md`, `docs/rights.md`, and `docs/release_gate.md`.
+See `docs/methods.md`, `docs/reproducibility.md`, `docs/rights.md`, `docs/license_proposal.md`, `docs/third_party_notices.md`, and `docs/release_gate.md`.
 
 ## License
 
-**Not selected.** This artifact is for private review only. Code contributor ownership, external terms,
-and disclosure approval must be resolved before public release.
+**Not yet selected or authorized.** `docs/license_proposal.md` compares proposed licensing and explains the decision required. Until the release gate is satisfied, no outbound open-source license is granted. Code ownership, third-party terms, and disclosures require approval.
