@@ -24,6 +24,31 @@ jobs:
         run: python examples/synthetic/run_demo.py
       - name: Build standalone wheel
         run: python -m pip wheel --no-deps -w dist .
+      - name: Verify official license, SPDX metadata and wheel payload
+        shell: bash
+        run: |
+          python - <<'PY'
+          import glob, pathlib, tomllib, zipfile
+          project = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']
+          assert project['license'] == 'Apache-2.0'
+          assert 'LICENSE' in project['license-files']
+          license_text = pathlib.Path('LICENSE').read_text()
+          assert 'Apache License' in license_text
+          assert 'Version 2.0, January 2004' in license_text
+          assert '3. Grant of Patent License' in license_text
+          wheels = glob.glob('dist/*.whl')
+          assert len(wheels) == 1, wheels
+          with zipfile.ZipFile(wheels[0]) as wheel:
+              names = wheel.namelist()
+              metadata_names = [n for n in names if n.endswith('.dist-info/METADATA')]
+              assert len(metadata_names) == 1
+              metadata = wheel.read(metadata_names[0]).decode()
+              assert 'License-Expression: Apache-2.0' in metadata, metadata
+              license_names = [n for n in names if n.endswith('/LICENSE')]
+              assert len(license_names) >= 1, names
+              assert any(b'Apache License' in wheel.read(n) for n in license_names)
+          print('Apache-2.0 source and wheel license consistency passed')
+          PY
       - name: Install built wheel in clean environment
         shell: bash
         run: |
